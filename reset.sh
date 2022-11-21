@@ -1,5 +1,6 @@
 #!/bin/bash
 
-rm -rf database/*
+shopt -s extglob
+rm -r database/!(README.md)
 
 cat /dev/null > shadow.txt
