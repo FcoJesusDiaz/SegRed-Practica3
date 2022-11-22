@@ -25,9 +25,8 @@ lock = Lock()
 app = Flask(__name__)
 api = Api(app, errors=exceptions.ERRORS)
 
-# This domain name works if 'myserver.local' is added to the 127.0.0.1 ip address line
-# in the /etc/hosts file'
-# app.config['SERVER_NAME'] = 'myserver.local:5000'
+
+app.config['SERVER_NAME'] = 'myserver.local:5000'
 
 
 # --------------------------------------------------------METHODS--------------------------------------------------------#
@@ -255,7 +254,6 @@ class AllDocuments(Resource):
         self.check_user(username)
         all_content = {}
         dir_path = f"{ROOT_DIR}{username}"
-        print(dir_path)
         files = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
 
         for file in files:
@@ -266,5 +264,4 @@ class AllDocuments(Resource):
 
 
 if __name__ == '__main__':
-    #Add ssl_context='adhoc' for https
-    app.run(debug=True)
+    app.run(debug=True, ssl_context=("domain.crt", "domain.key"))
