@@ -29,12 +29,15 @@ token=$(curl --silent --cacert domain.crt --data '{"username":"paco", "password"
 
 
 set -v
+
+
+
 ######################################## /<string:username>/<string:doc_id> ########################################
 # POST file
     # Form data
 curl -H "Authorization: token $token" --data "doc_content={\"ingredientes\":[\"arroz\", \"leche\"]}" --cacert domain.crt  https://myserver.local:5000/paco/arroz_con_leche
     
-    # Json data (json instide json)
+    # Json data (json inside json)
 curl -H "Authorization: token $token" --data '{"doc_content":"{\"ingredientes\":[\"arroz\", \"leche\"]}"}' --cacert domain.crt  https://myserver.local:5000/paco/tarta_de_queso
 
 
@@ -87,8 +90,10 @@ curl -H "Authorization: token $token" --data "doc_content={\"ingredientes\":[\"h
 # Authorization header not included
 curl --cacert domain.crt  https://myserver.local:5000/paco/tarta_de_queso
 
+
 # Bad syntax on auth header
 curl -H "Authorization: bearer $token" --cacert domain.crt  https://myserver.local:5000/paco/arroz_con_leche
+
 
 # Trying to access other users content with incorrect token
 curl -H "Authorization: token $token" --cacert domain.crt  https://myserver.local:5000/miguel/pollo_asado
