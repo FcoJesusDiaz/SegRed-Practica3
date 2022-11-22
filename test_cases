@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# TEST CASES MADE BY FRANCISCO JESÚS DÍAZ PELLEJERO AND MIGUEL DE LAS HERAS FUENTES
+
+set -v
+# Delete all users and media
+./reset
+
+###################################################### /version ######################################################
+# Get application version
+curl --cacert domain.crt https://myserver.local:5000/version
+
+
+###################################################### /signup ######################################################
+# Create 2 users
+    # Passing json as parameters
+curl --cacert domain.crt --data '{"username":"paco", "password":"hola"}' https://myserver.local:5000/signup
+
+    # Passing FORM data
+curl --cacert domain.crt --data "username=miguel&password=adios" https://myserver.local:5000/signup
+
+
+###################################################### /login ######################################################
+set +v 
+# Login with an existing user
+echo "curl --cacert domain.crt --data '{"username":"paco", "password":"hola"}' https://myserver.local:5000/login"
+
+token=$(curl --silent --cacert domain.crt --data '{"username":"paco", "password":"hola"}' https://myserver.local:5000/login | tee /dev/stderr | jq -r '.access_token')
+
+
+set -v
+######################################## /<string:username>/<string:doc_id> ########################################
+# POST file
+    # Form data
+curl -H "Authorization: token $token" --data "doc_content={\"ingredientes\":[\"arroz\", \"leche\"]}" --cacert domain.crt  https://myserver.local:5000/paco/arroz_con_leche
+    
+    # Json data (json instide json)
+curl -H "Authorization: token $token" --data '{"doc_content":"{\"ingredientes\":[\"arroz\", \"leche\"]}"}' --cacert domain.crt  https://myserver.local:5000/paco/tarta_de_queso
+
+
+# GET file
+    # File exists
+curl -H "Authorization: token $token" --cacert domain.crt  https://myserver.local:5000/paco/arroz_con_leche
+
+
+# PUT file (update contents)
+    # File exists
+curl -X PUT -H "Authorization: token $token" --data "doc_content={\"ingredientes\":[\"arroz\", \"leche\", \"canela\"]}" --cacert domain.crt  https://myserver.local:5000/paco/arroz_con_leche
+
+
+# DELETE file
+    # File exists
+curl -X DELETE -H "Authorization: token $token" --cacert domain.crt  https://myserver.local:5000/paco/arroz_con_leche
+
+
+######################################## /<string:username>/_all_docs ########################################
+# Print all documents in one json
+curl -H "Authorization: token $token" --cacert domain.crt  https://myserver.local:5000/paco/_all_docs
+
+
+
+###################################### ERRORS AND INCORRECT INPUT CASES ######################################
+# Wrong method
+curl --cacert domain.crt --data '{"parameter":"value"}' https://myserver.local:5000/version
+
+
+# Wrong parameters
+curl --cacert domain.crt --data "user=jesus&pass=ola" https://myserver.local:5000/signup
+
+
+# Login with a non-existing user
+curl --cacert domain.crt --data '{"username":"jesus", "password":"ola"}' https://myserver.local:5000/login
+
+
+# Wrong password
+curl --cacert domain.crt --data '{"username":"paco", "password":"adios"}' https://myserver.local:5000/login
+
+
+# File does not exist
+curl -H "Authorization: token $token" --cacert domain.crt  https://myserver.local:5000/paco/paella_valenciana
+
+
+# File already exists
+curl -H "Authorization: token $token" --data "doc_content={\"ingredientes\":[\"huevos\", \"queso\"]}" --cacert domain.crt  https://myserver.local:5000/paco/tarta_de_queso
+
+
+# Authorization header not included
+curl --cacert domain.crt  https://myserver.local:5000/paco/tarta_de_queso
+
+# Bad syntax on auth header
+curl -H "Authorization: bearer $token" --cacert domain.crt  https://myserver.local:5000/paco/arroz_con_leche
+
+# Trying to access other users content with incorrect token
+curl -H "Authorization: token $token" --cacert domain.crt  https://myserver.local:5000/miguel/pollo_asado
