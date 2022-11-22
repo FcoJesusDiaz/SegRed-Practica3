@@ -1,0 +1,9 @@
+#!/bin/bash
+
+shopt -s extglob
+
+if [ "$(ls database -A -I "README.md")" ]; then
+    rm -r database/!(README.md)
+fi
+
+cat /dev/null > shadow.txt

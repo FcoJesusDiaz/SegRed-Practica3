@@ -1,1 +1,1 @@
-Root directory for users jsons storage
+Directory for users jsons storage
