@@ -37,6 +37,7 @@ The introduction of the `1234` passphrase will be mandatory everytime the applic
 # Run test cases
 Some test cases done in curl, regarding common uses and errors have been added to this assignement. To run this file:
   1. ./test_cases
+
 The output should be all the commands used with curl and the response of the server. The main application should be running first
 When we execute the test cases the reset file is executed first to delete all media and all users
 
